@@ -1,165 +1,89 @@
 import { Router } from 'express';
+import { getRepository } from 'typeorm';
+import User from '../models/User';
 
-import { v4 } from 'uuid';
+import CreateUserService from '../services/CreateUserService';
+import FindUserService from '../services/FindUserService';
+import FindUserSocialService from '../services/FindUserSocialService';
+import UpdateUserSocialService from '../services/UpdateUserSocialService';
+import UpdateUserService from '../services/UpdateUserService';
+import UpdateUserPasswordService from '../services/UpdateUserPasswordService';
+
 
 const usersRouter = Router();
 
-interface User {
-    // info
-    id_user: string;
-    name: string;
-    username: string;
-    email: string;
-    password: string;
-
-    // profile
-    avatarImage: string | null;
-    backgroundImage: string | null;
-    bio: string | null;
-    nivel: string;
-    moedas: string;
-    amigos: string;
-
-    // bd
-    created_at: string;
-    updated_at: string;
-
-    socials: {
-        telegram?: string;
-        facebook?: string;
-        twitter?: string;
-        twitch?: string;
-    }
-};
-
-let users: User[] = [];
-
-users.push({
-    id_user: "1",
-    name: "Rafael",
-    username: "rafa2021",
-    email: "rafa@gmail.com",
-    password: "1234",
-
-    avatarImage: null,
-    backgroundImage: null,
-    bio: "Gosto de peixe frito.",
-    nivel: "1",
-    moedas: "0",
-    amigos: "0",
-
-    created_at: "2021-03-28-15-29-00",
-    updated_at: "2021-03-28-15-29-00",
-
-    socials: {
-        telegram: "bottled",
-        facebook: "Matt",
-        twitter: "cloudy",
-        twitch: "weather"
-    }
-})
-
+// não deve ser lançado
 usersRouter.get('/', async (request, response) => {
-    return response.json({ data: users })
+  const usersRepository = getRepository(User);
+
+  const users = await usersRepository.find();
+
+  return response.json({ data: users })
 });
 
 usersRouter.get('/:id', async (request, response) => {
-    let { id } = request.params;
+  const { id } = request.params;
 
-    let findUser = users.find((user) => {
-        return user.id_user == id;
-    });
+  const findUser = new FindUserService();
 
-    if (!findUser) {
-        return response.json({ message: "User not found" });
-    }
+  const user = await findUser.execute(id);
 
-    return response.json({ data: findUser })
+  return response.json({ data: user });
 });
 
 usersRouter.post('/', async (request, response) => {
-    const { name, username, email, password } = request.body;
+  const { name, username, email, birth_date, password, avatar_image, background_image } = request.body;
 
-    const today = new Date();
-    const dd = String(today.getDate()).padStart(2, '0');
-    const mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
-    const yyyy = today.getFullYear();
+  const createUser = new CreateUserService();
 
-    const todayFormattedDate = dd + '/' + mm + '/' + yyyy;
+  const user = await createUser.execute({ name, username, email, birth_date, password, avatar_image, background_image });
 
-    const user = { id_user: v4(), name, username, email, password, avatarImage: "", backgroundImage: "", bio: "", nivel: "1", moedas: "0", amigos: "0", created_at: todayFormattedDate, updated_at: todayFormattedDate, socials: {} };
+  return response.json({ message: "User successfully created." })
 
-    users.push(user);
-
-    return response.json({ message: "User successfully created." })
 });
 
 usersRouter.patch('/edit/:id', async (request, response) => {
-    const { id } = request.params;
-    const { name, username, bio, email, password } = request.body;
+  const { id } = request.params;
+  const { name, username, bio, email, birth_date } = request.body;
 
-    const findUserIndex = users.findIndex((user) => {
-        if (user.id_user == id) return true;
-    });
+  const updateUserService = new UpdateUserService();
 
-    if (findUserIndex == -1) {
-        return response.json({ message: "User not found." });
-    }
+  await updateUserService.execute({ id_user: id, name, username, bio, email, birth_date });
 
-    const today = new Date();
-    const dd = String(today.getDate()).padStart(2, '0');
-    const mm = String(today.getMonth() + 1).padStart(2, '0');
-    const yyyy = today.getFullYear();
-
-    const todayFormattedDate = dd + '/' + mm + '/' + yyyy;
-
-    users[findUserIndex].name = name;
-    users[findUserIndex].username = username;
-    users[findUserIndex].bio = bio;
-    users[findUserIndex].email = email;
-    users[findUserIndex].password = password;
-    users[findUserIndex].updated_at = todayFormattedDate;
-
-    return response.json({ message: "User sucessfully updated." })
+  return response.json({ message: "User info sucessfully updated." })
 });
 
-usersRouter.patch('/edit/socials/:id', async (request, response) => {
-    const { id } = request.params;
-    const { telegram, facebook, twitter, twitch } = request.body;
+usersRouter.get('/social/:id', async (request, response) => {
+  const { id } = request.params;
 
-    const findUserIndex = users.findIndex((user) => {
-        if (user.id_user == id) return true;
-    });
+  const findUserSocial = new FindUserSocialService();
 
-    if (findUserIndex == -1) {
-        return response.json({ message: "User not found." });
-    };
+  const social = await findUserSocial.execute(id);
 
-    if (!!telegram) users[findUserIndex].socials.telegram = telegram;
-    if (!!facebook) users[findUserIndex].socials.facebook = facebook;
-    if (!!twitter) users[findUserIndex].socials.twitter = twitter;
-    if (!!twitch) users[findUserIndex].socials.twitch = twitch;
-
-    return response.json({ message: "Social data sucessfully updated." })
+  return response.json({ data: social });
 });
+
+usersRouter.patch('/edit/social/:id', async (request, response) => {
+  const { id } = request.params;
+  const { telegram, facebook, twitter, twitch } = request.body;
+
+  const updateUserSocialService = new UpdateUserSocialService();
+
+  await updateUserSocialService.execute({ id_user: id, telegram, facebook, twitter, twitch });
+
+  return response.json({ message: "Social info sucessfully updated." });
+});
+
 
 usersRouter.patch('/edit/password/:id', async (request, response) => {
-    const { id } = request.params;
-    const { password_old, password_new } = request.body;
+  const { id } = request.params;
+  const { password_old, password_new } = request.body;
 
-    const findUserIndex = users.findIndex((user) => {
-        if (user.id_user == id) return true;
-    });
+  const updateUserPasswordService = new UpdateUserPasswordService();
 
-    if (findUserIndex == -1) {
-        return response.json({ message: "User not found." });
-    };
+  await updateUserPasswordService.execute({ id_user: id, password_old: password_old, password_new: password_new });
 
-    if (users[findUserIndex].password != password_old) return response.json({ message: "Senha atual incorreta." })
-
-    users[findUserIndex].password = password_new;
-
-    return response.json({ message: "Password sucessfully updated." })
+  return response.json({ message: "Password sucessfully updated." })
 
 });
 

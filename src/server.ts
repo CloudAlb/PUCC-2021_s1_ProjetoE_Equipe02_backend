@@ -2,6 +2,9 @@ import 'reflect-metadata';
 
 import express, { Request, Response, NextFunction } from 'express';
 import 'express-async-errors';
+
+import { createConnection } from "typeorm";
+
 import routes from './routes';
 import AppError from './errors/AppError';
 
@@ -12,6 +15,8 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(routes);
+
+createConnection();
 
 app.use((err: Error, request: Request, response: Response, _: NextFunction) => {
   if (err instanceof AppError) {
