@@ -7,6 +7,7 @@ import {
   ManyToOne,
   JoinColumn,
   PrimaryColumn,
+  OneToOne,
 } from 'typeorm';
 
 import User from './User';
@@ -16,7 +17,7 @@ class Social {
   @PrimaryGeneratedColumn('uuid')
   id_social: string;
 
-  @ManyToOne(() => User)
+  @OneToOne(() => User)
   @JoinColumn({ name: 'user_id' })
   user: User;
 
