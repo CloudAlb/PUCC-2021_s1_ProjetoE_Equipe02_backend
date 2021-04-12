@@ -9,14 +9,12 @@ import GetDateNow from "../services/GetDateNow";
 
 interface Request {
   id_user: string;
-  telegram: string;
-  facebook: string;
-  twitter: string;
-  twitch: string;
+  social_network: string;
+  username: string;
 }
 
 class UpdateUserSocialService {
-  public async execute({ id_user, telegram, facebook, twitter, twitch }: Request): Promise<Social> {
+  public async execute({ id_user, social_network, username }: Request): Promise<Social> {
     const usersRepository = getRepository(User);
     const socialRepository = getRepository(Social);
 
@@ -36,10 +34,24 @@ class UpdateUserSocialService {
 
     const getDateNow = new GetDateNow();
 
-    social.telegram = telegram;
-    social.facebook = facebook;
-    social.twitter = twitter;
-    social.twitch = twitch;
+    switch (social_network) {
+      case 'telegram':
+        social.telegram = username;
+        break;
+      case 'facebook':
+        social.facebook = username;
+        break;
+      case 'twitter':
+        social.twitter = username;
+        break;
+      case 'twitch':
+        social.twitch = username;
+        break;
+
+      default:
+        break;
+    }
+
     social.updated_at = getDateNow.execute();
 
     await socialRepository.save(social);

@@ -8,12 +8,14 @@ import FindUserSocialService from '../services/FindUserSocialService';
 import UpdateUserSocialService from '../services/UpdateUserSocialService';
 import UpdateUserService from '../services/UpdateUserService';
 import UpdateUserPasswordService from '../services/UpdateUserPasswordService';
+import ensureAuthenticated from '../middlewares/ensureAuthenticated';
+import ensureAdmin from '../middlewares/ensureAdmin';
 
 
 const usersRouter = Router();
 
 // não deve ser lançado
-usersRouter.get('/', async (request, response) => {
+usersRouter.get('/list', async (request, response) => {
   const usersRepository = getRepository(User);
 
   const users = await usersRepository.find();
@@ -21,14 +23,31 @@ usersRouter.get('/', async (request, response) => {
   return response.json({ data: users })
 });
 
-usersRouter.get('/:id', async (request, response) => {
-  const { id } = request.params;
 
+// TODO, criar middleware ensureIsOwnUser é necessário?
+// usar browserAgent, Encrypted Local Storage ou algo do tipo
+usersRouter.get('/', ensureAuthenticated, async (request, response) => {
   const findUser = new FindUserService();
 
-  const user = await findUser.execute(id);
+  const user = await findUser.execute(request.user.id_user);
 
-  return response.json({ data: user });
+  const userWithoutPassword = {
+    id_user: user.id_user,
+    name: user.name,
+    username: user.username,
+    email: user.email,
+    birth_date: user.birth_date,
+    avatar_image: user.avatar_image,
+    background_image: user.background_image,
+    bio: user.bio,
+    level: user.level,
+    coins: user.coins,
+    friends: user.friends,
+    created_at: user.created_at,
+    updated_at: user.updated_at,
+  }
+
+  return response.json({ data: userWithoutPassword });
 });
 
 usersRouter.post('/', async (request, response) => {
@@ -42,46 +61,41 @@ usersRouter.post('/', async (request, response) => {
 
 });
 
-usersRouter.patch('/edit/:id', async (request, response) => {
-  const { id } = request.params;
+usersRouter.patch('/edit', ensureAuthenticated, async (request, response) => {
   const { name, username, bio, email, birth_date } = request.body;
 
   const updateUserService = new UpdateUserService();
 
-  await updateUserService.execute({ id_user: id, name, username, bio, email, birth_date });
+  await updateUserService.execute({ id_user: request.user.id_user, name, username, bio, email, birth_date });
 
   return response.json({ message: "User info sucessfully updated." })
 });
 
-usersRouter.get('/social/:id', async (request, response) => {
-  const { id } = request.params;
-
+usersRouter.get('/social', ensureAuthenticated, async (request, response) => {
   const findUserSocial = new FindUserSocialService();
 
-  const social = await findUserSocial.execute(id);
+  const social = await findUserSocial.execute(request.user.id_user);
 
   return response.json({ data: social });
 });
 
-usersRouter.patch('/edit/social/:id', async (request, response) => {
-  const { id } = request.params;
-  const { telegram, facebook, twitter, twitch } = request.body;
+usersRouter.patch('/edit/social', ensureAuthenticated, async (request, response) => {
+  const { social_network, username } = request.body;
 
   const updateUserSocialService = new UpdateUserSocialService();
 
-  await updateUserSocialService.execute({ id_user: id, telegram, facebook, twitter, twitch });
+  await updateUserSocialService.execute({ id_user: request.user.id_user, social_network, username });
 
   return response.json({ message: "Social info sucessfully updated." });
 });
 
 
-usersRouter.patch('/edit/password/:id', async (request, response) => {
-  const { id } = request.params;
+usersRouter.patch('/edit/password', ensureAuthenticated, async (request, response) => {
   const { password_old, password_new } = request.body;
 
   const updateUserPasswordService = new UpdateUserPasswordService();
 
-  await updateUserPasswordService.execute({ id_user: id, password_old: password_old, password_new: password_new });
+  await updateUserPasswordService.execute({ id_user: request.user.id_user, password_old: password_old, password_new: password_new });
 
   return response.json({ message: "Password sucessfully updated." })
 
