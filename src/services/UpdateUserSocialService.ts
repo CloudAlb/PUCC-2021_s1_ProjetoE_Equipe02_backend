@@ -5,7 +5,7 @@ import AppError from '../errors/AppError';
 import User from '../models/User';
 import Social from '../models/Social';
 
-import GetDateNow from "../services/GetDateNow";
+import GetDateNow from '../services/GetDateNow';
 
 interface Request {
   id_user: string;
@@ -14,25 +14,27 @@ interface Request {
 }
 
 class UpdateUserSocialService {
-  public async execute({ id_user, social_network, username }: Request): Promise<Social> {
+  public async execute({
+    id_user,
+    social_network,
+    username,
+  }: Request): Promise<Social> {
     const usersRepository = getRepository(User);
     const socialRepository = getRepository(Social);
 
     const user = await usersRepository.findOne({
-      where: { id_user: id_user }
+      where: { id_user: id_user },
     });
 
     if (!user) {
       throw new AppError('User does not exist.');
-    };
+    }
 
     const social = await socialRepository.findOne({
       where: { user: user },
     });
 
-    if (!social) throw new AppError("User does not exist.");
-
-    const getDateNow = new GetDateNow();
+    if (!social) throw new AppError('User does not exist.');
 
     switch (social_network) {
       case 'telegram':
@@ -51,6 +53,8 @@ class UpdateUserSocialService {
       default:
         break;
     }
+
+    const getDateNow = new GetDateNow();
 
     social.updated_at = getDateNow.execute();
 

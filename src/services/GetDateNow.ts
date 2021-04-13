@@ -7,7 +7,8 @@ class GetDateTimeNow {
 
     const time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
 
-    const todayFormattedDate = dd + '/' + mm + '/' + yyyy + ' ' + time;
+    // TODO
+    const todayFormattedDate = yyyy + '-' + mm + '-' + dd + 'T' + time;
 
     const todayDate = new Date(todayFormattedDate);
 
