@@ -11,27 +11,23 @@ import {
 } from 'typeorm';
 
 import User from './User';
+import Camp from './Tournament';
 
-@Entity('socials')
-class Social {
+@Entity('publications')
+class Publicacao {
   @PrimaryGeneratedColumn('uuid')
-  id_social: string;
+  id_pub: string;
 
   @OneToOne(() => User)
   @JoinColumn({ name: 'user_id' })
   user: User;
 
-  @Column()
-  telegram: string;
+  @OneToOne(() => Camp)
+  @JoinColumn({ name: 'id_camp' })
+  id_camp: string;
 
   @Column()
-  facebook: string;
-
-  @Column()
-  twitter: string;
-
-  @Column()
-  twitch: string;
+  publicacao: string;
 
   @CreateDateColumn()
   created_at: Date;
@@ -40,4 +36,4 @@ class Social {
   updated_at: Date;
 }
 
-export default Social;
+export default Publicacao;
