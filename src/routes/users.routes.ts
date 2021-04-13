@@ -51,11 +51,11 @@ usersRouter.get('/', ensureAuthenticated, async (request, response) => {
 });
 
 usersRouter.post('/', async (request, response) => {
-  const { name, username, email, birth_date, password, avatar_image, background_image } = request.body;
+  const { name, username, email, birth_date, password } = request.body;
 
   const createUser = new CreateUserService();
 
-  const user = await createUser.execute({ name, username, email, birth_date, password, avatar_image, background_image });
+  const user = await createUser.execute({ name, username, email, birth_date, password });
 
   return response.json({ message: "User successfully created." })
 

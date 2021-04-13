@@ -13,12 +13,10 @@ interface Request {
   email: string;
   birth_date: string;
   password: string;
-  avatar_image: string;
-  background_image: string;
 }
 
 class CreateUserService {
-  public async execute({ name, username, email, birth_date, password, avatar_image, background_image }: Request): Promise<User> {
+  public async execute({ name, username, email, birth_date, password }: Request): Promise<User> {
     const usersRepository = getRepository(User);
     const socialsRepository = getRepository(Social);
 
@@ -36,7 +34,7 @@ class CreateUserService {
     // TODO, arrumar regras de negócio para avatar_image e background_image
     // TODO, arrumar o formato das datas e padronizar com a equipe
     const user = usersRepository.create({
-      id_user: v4(), name, username, email, birth_date, password: hashedPassword, avatar_image, background_image, bio: "", level: "1", coins: "0", friends: "0"
+      id_user: v4(), name, username, email, birth_date, password: hashedPassword, avatar_image: "", background_image: "", bio: "", level: "1", coins: "0", friends: "0"
     });
     await usersRepository.save(user);
 
