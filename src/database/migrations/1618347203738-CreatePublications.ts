@@ -19,22 +19,22 @@ export class CreatePublications1618347203738 implements MigrationInterface {
               type: 'uuid',
               isNullable: true
             },
-            {
-              name: 'description',
-              type: 'varchar',
-            },
-            {
-              name: 'likes',
-              type: 'integer',
-            },
+            // {
+            //   name: 'description',
+            //   type: 'varchar',
+            // },
+            // {
+            //   name: 'likes',
+            //   type: 'integer',
+            // },
             // {
             //   name: 'comment_id',
             //   type: 'varchar',
             // },
-            {
-              name: 'shares',
-              type: 'integer',
-            },
+            // {
+            //   name: 'shares',
+            //   type: 'integer',
+            // },
             {
               name: 'created_at',
               type: 'timestamp',

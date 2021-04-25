@@ -26,8 +26,8 @@ class Publicacao {
   @JoinColumn({ name: 'id_camp' })
   id_camp: string;
 
-  @Column()
-  publicacao: string;
+  // @Column()
+  // publicacao: string;
 
   @CreateDateColumn()
   created_at: Date;

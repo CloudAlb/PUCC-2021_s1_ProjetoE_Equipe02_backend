@@ -8,13 +8,12 @@ interface Pub {
     // info
     id_pub: string;
     id_user: string;
-    publicacao?: string;
 
     // bd
     created_at: string;
     updated_at: string;
 
-    campeonato?: {
+    campeonato: {
         id: string;
         nome: string;
         jogo: string;
@@ -26,20 +25,18 @@ let pubs: Pub[] = [];
 pubs.push({
     id_pub: "555",
     id_user: "1",
-    publicacao: "Olá pessoal sou um novo usuário !!!",
 
     created_at: "2021-04-06-21-00-00",
     updated_at: "2021-04-06-21-00-00",
 
     campeonato: {
-            id: "",
-            nome: "",
-            jogo: ""
+            id: "555",
+            nome: "Bootcamp",
+            jogo: "CS GO"
     }
 },{
   id_pub: "1518",
   id_user: "5",
-  publicacao: "",
 
   created_at: "2021-04-06-21-00-00",
   updated_at: "2021-04-06-21-00-00",
@@ -70,7 +67,7 @@ pubsRouter.get('/:id', async (request, response) => {
 });
 
 pubsRouter.post('/', async (request, response) => {
-    const { publicacao, campeonato } = request.body;
+    const { campeonato } = request.body;
 
     const today = new Date();
     const dd = String(today.getDate()).padStart(2, '0');
@@ -81,7 +78,6 @@ pubsRouter.post('/', async (request, response) => {
 
     const pub = { id_pub: v4(),
                   id_user: v4(),
-                  publicacao,
                   created_at: todayFormattedDate,
                   updated_at: todayFormattedDate,
                   campeonato };
@@ -89,31 +85,6 @@ pubsRouter.post('/', async (request, response) => {
     pubs.push(pub);
 
     return response.json({ message: "Publicação criada com sucesso !!!" })
-});
-
-pubsRouter.patch('/edit/:id', async (request, response) => {
-    const { id } = request.params;
-    const { publicacao } = request.body;
-
-    const findPubIndex = pubs.findIndex((pub) => {
-        if (pub.id_pub == id) return true;
-    });
-
-    if (findPubIndex == -1) {
-        return response.json({ message: "Publicação não encontrada !!!" });
-    }
-
-    const today = new Date();
-    const dd = String(today.getDate()).padStart(2, '0');
-    const mm = String(today.getMonth() + 1).padStart(2, '0');
-    const yyyy = today.getFullYear();
-
-    const todayFormattedDate = dd + '/' + mm + '/' + yyyy;
-
-    pubs[findPubIndex].publicacao = publicacao;
-    pubs[findPubIndex].updated_at = todayFormattedDate;
-
-    return response.json({ message: "Publicação atualizada com sucesso !!!" })
 });
 
 pubsRouter.patch('/edit/campeonato/:id', async (request, response) => {
@@ -140,5 +111,30 @@ pubsRouter.patch('/edit/campeonato/:id', async (request, response) => {
 
   return response.json({ message: "Publicação atualizada com sucesso !!!" })
 });
+
+// pubsRouter.patch('/edit/:id', async (request, response) => {
+//     const { id } = request.params;
+//     const { publicacao } = request.body;
+
+//     const findPubIndex = pubs.findIndex((pub) => {
+//         if (pub.id_pub == id) return true;
+//     });
+
+//     if (findPubIndex == -1) {
+//         return response.json({ message: "Publicação não encontrada !!!" });
+//     }
+
+//     const today = new Date();
+//     const dd = String(today.getDate()).padStart(2, '0');
+//     const mm = String(today.getMonth() + 1).padStart(2, '0');
+//     const yyyy = today.getFullYear();
+
+//     const todayFormattedDate = dd + '/' + mm + '/' + yyyy;
+
+//     pubs[findPubIndex].publicacao = publicacao;
+//     pubs[findPubIndex].updated_at = todayFormattedDate;
+
+//     return response.json({ message: "Publicação atualizada com sucesso !!!" })
+// });
 
 export default pubsRouter;
