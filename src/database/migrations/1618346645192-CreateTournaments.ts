@@ -23,16 +23,18 @@ export class CreateTournaments1618346645192 implements MigrationInterface {
               type: 'varchar',
             },
             {
-              name: 'game_type',
-              type: 'varchar',
-            },
-            {
               name: 'description',
               type: 'varchar',
             },
             {
-              name: 'number_teams',
-              type: 'integer',
+              name: 'password',
+              type: 'varchar',
+              isNullable: true,
+            },
+            {
+              name: 'ended_at',
+              type: 'timestamp',
+              isNullable: true,
             },
             {
               name: 'created_at',

@@ -42,7 +42,7 @@ class User {
   coins: string;
 
   @Column()
-  friends: string;
+  followers: string;
 
   @CreateDateColumn()
   created_at: Date;

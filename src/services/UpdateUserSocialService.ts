@@ -5,8 +5,6 @@ import AppError from '../errors/AppError';
 import User from '../models/User';
 import Social from '../models/Social';
 
-import GetDateNow from '../services/GetDateNow';
-
 interface Request {
   id_user: string;
   social_network: string;
@@ -53,10 +51,6 @@ class UpdateUserSocialService {
       default:
         break;
     }
-
-    const getDateNow = new GetDateNow();
-
-    social.updated_at = getDateNow.execute();
 
     await socialRepository.save(social);
 

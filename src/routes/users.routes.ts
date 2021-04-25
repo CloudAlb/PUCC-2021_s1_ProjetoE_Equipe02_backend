@@ -10,19 +10,35 @@ import UpdateUserService from '../services/UpdateUserService';
 import UpdateUserPasswordService from '../services/UpdateUserPasswordService';
 import ensureAuthenticated from '../middlewares/ensureAuthenticated';
 import ensureAdmin from '../middlewares/ensureAdmin';
-
+import AuthenticateUserService from '../services/AuthenticateUserService';
 
 const usersRouter = Router();
 
-// não deve ser lançado
+interface userWithoutSensitiveInfo {
+  id_user: string;
+  name: string;
+  username: string;
+  avatar_image: string;
+}
+
 usersRouter.get('/list', async (request, response) => {
   const usersRepository = getRepository(User);
 
   const users = await usersRepository.find();
 
-  return response.json({ data: users })
-});
+  let usersWithoutSensitiveInfo: userWithoutSensitiveInfo[] = [];
 
+  users.map(user => {
+    usersWithoutSensitiveInfo.push({
+      id_user: user.id_user,
+      name: user.name,
+      username: user.username,
+      avatar_image: user.avatar_image,
+    });
+  });
+
+  return response.json({ data: usersWithoutSensitiveInfo });
+});
 
 // TODO, criar middleware ensureIsOwnUser é necessário?
 // usar browserAgent, Encrypted Local Storage ou algo do tipo
@@ -42,10 +58,10 @@ usersRouter.get('/', ensureAuthenticated, async (request, response) => {
     bio: user.bio,
     level: user.level,
     coins: user.coins,
-    friends: user.friends,
+    followers: user.followers,
     created_at: user.created_at,
     updated_at: user.updated_at,
-  }
+  };
 
   return response.json({ data: userWithoutPassword });
 });
@@ -55,10 +71,22 @@ usersRouter.post('/', async (request, response) => {
 
   const createUser = new CreateUserService();
 
-  const user = await createUser.execute({ name, username, email, birth_date, password });
+  const user = await createUser.execute({
+    name,
+    username,
+    email,
+    birth_date,
+    password,
+  });
 
-  return response.json({ message: "User successfully created." })
+  const authenticateUser = new AuthenticateUserService();
 
+  const token = await authenticateUser.execute({
+    login: user.username,
+    password: password,
+  });
+
+  return response.json({ message: 'User successfully created.', token: token });
 });
 
 usersRouter.patch('/edit', ensureAuthenticated, async (request, response) => {
@@ -66,9 +94,16 @@ usersRouter.patch('/edit', ensureAuthenticated, async (request, response) => {
 
   const updateUserService = new UpdateUserService();
 
-  await updateUserService.execute({ id_user: request.user.id_user, name, username, bio, email, birth_date });
+  await updateUserService.execute({
+    id_user: request.user.id_user,
+    name,
+    username,
+    bio,
+    email,
+    birth_date,
+  });
 
-  return response.json({ message: "User info sucessfully updated." })
+  return response.json({ message: 'User info sucessfully updated.' });
 });
 
 usersRouter.get('/social', ensureAuthenticated, async (request, response) => {
@@ -79,26 +114,40 @@ usersRouter.get('/social', ensureAuthenticated, async (request, response) => {
   return response.json({ data: social });
 });
 
-usersRouter.patch('/edit/social', ensureAuthenticated, async (request, response) => {
-  const { social_network, username } = request.body;
+usersRouter.patch(
+  '/edit/social',
+  ensureAuthenticated,
+  async (request, response) => {
+    const { social_network, username } = request.body;
 
-  const updateUserSocialService = new UpdateUserSocialService();
+    const updateUserSocialService = new UpdateUserSocialService();
 
-  await updateUserSocialService.execute({ id_user: request.user.id_user, social_network, username });
+    await updateUserSocialService.execute({
+      id_user: request.user.id_user,
+      social_network,
+      username,
+    });
 
-  return response.json({ message: "Social info sucessfully updated." });
-});
+    return response.json({ message: 'Social info sucessfully updated.' });
+  },
+);
 
+usersRouter.patch(
+  '/edit/password',
+  ensureAuthenticated,
+  async (request, response) => {
+    const { password_old, password_new } = request.body;
 
-usersRouter.patch('/edit/password', ensureAuthenticated, async (request, response) => {
-  const { password_old, password_new } = request.body;
+    const updateUserPasswordService = new UpdateUserPasswordService();
 
-  const updateUserPasswordService = new UpdateUserPasswordService();
+    await updateUserPasswordService.execute({
+      id_user: request.user.id_user,
+      password_old: password_old,
+      password_new: password_new,
+    });
 
-  await updateUserPasswordService.execute({ id_user: request.user.id_user, password_old: password_old, password_new: password_new });
-
-  return response.json({ message: "Password sucessfully updated." })
-
-});
+    return response.json({ message: 'Password sucessfully updated.' });
+  },
+);
 
 export default usersRouter;

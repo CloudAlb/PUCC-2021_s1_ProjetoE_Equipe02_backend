@@ -11,7 +11,7 @@ class FindUserSocialService {
     const socialRepository = getRepository(Social);
 
     const user = await usersRepository.findOne({
-      where: { id_user: id_user}
+      where: { id_user }
     });
 
     if (!user) {
@@ -20,7 +20,7 @@ class FindUserSocialService {
     };
 
     const social = await socialRepository.findOne({
-      where: { user: user },
+      where: { user },
     });
 
     if (!social) {

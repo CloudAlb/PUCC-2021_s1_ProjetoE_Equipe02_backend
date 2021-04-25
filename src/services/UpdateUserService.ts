@@ -5,8 +5,6 @@ import AppError from '../errors/AppError';
 import User from '../models/User';
 import Social from '../models/Social';
 
-import GetDateNow from "../services/GetDateNow";
-
 interface Request {
   id_user: string;
   name: string;
@@ -29,13 +27,10 @@ class UpdateUserService {
       throw new AppError('User does not exist.');
     };
 
-    const getDateNow = new GetDateNow();
-
     user.name = name;
     user.username = username;
     user.bio = bio;
     user.birth_date = new Date(birth_date); // TODO, funciona?
-    user.updated_at = getDateNow.execute();
 
     await usersRepository.save(user);
 

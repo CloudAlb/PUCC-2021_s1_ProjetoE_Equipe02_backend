@@ -28,7 +28,7 @@ export class CreateUsers1617210132141 implements MigrationInterface {
           },
           {
             name: 'birth_date',
-            type: 'timestamp with time zone',
+            type: 'date',
           },
           {
             name: 'password',
@@ -58,7 +58,7 @@ export class CreateUsers1617210132141 implements MigrationInterface {
             type: 'varchar',
           },
           {
-            name: 'friends',
+            name: 'followers',
             type: 'varchar',
           },
           {

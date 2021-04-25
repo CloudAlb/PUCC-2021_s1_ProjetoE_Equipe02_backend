@@ -25,7 +25,7 @@ class AuthenticateUserService {
     // TODO, ajeitar todos os HTTP status code
     // Por que tem que deixar 200 para funcionar?
     if (!user) {
-      throw new AppError('Incorrect email/password combination.', 200);
+      throw new AppError('Incorrect login/password combination.', 200);
     }
 
     // user.password -> senha criptografada
@@ -34,7 +34,7 @@ class AuthenticateUserService {
     const passwordMatched = await compare(password, user.password);
 
     if (!passwordMatched) {
-      throw new AppError('Incorrect email/password combination.', 200);
+      throw new AppError('Incorrect login/password combination.', 200);
     }
 
     // usuário autenticado
@@ -47,8 +47,6 @@ class AuthenticateUserService {
       // pensar na questão "experiência de usuário X segurança"
       // estratégias de refresh token
     });
-
-    console.log("Passou tudo. Token: " + token);
 
     return { token };
   }

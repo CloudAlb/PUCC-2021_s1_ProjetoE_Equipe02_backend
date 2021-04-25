@@ -1,43 +1,41 @@
 import { MigrationInterface, QueryRunner, Table } from 'typeorm';
 
-export class CreateSocials1617646181807 implements MigrationInterface {
+export class CreateTournamentColumnsTable1619039853111
+  implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(
       new Table({
-        name: 'socials',
+        name: 'tournamentColumns',
         columns: [
           {
-            name: 'id_social',
+            name: 'id_tournamentColumns',
             type: 'integer',
             isPrimary: true,
             isGenerated: true,
             generationStrategy: 'increment',
           },
-          // TODO, queria que essa chave (futuramente estrangeira)
-          // fosse a coluna identificadora dessa tabela
-          // é possível fazer isso?
           {
-            name: 'user_id',
+            name: 'tournament_id',
             type: 'uuid',
             isNullable: true,
           },
           {
-            name: 'telegram',
+            name: 'column1',
             type: 'varchar',
             isNullable: true,
           },
           {
-            name: 'facebook',
+            name: 'column2',
             type: 'varchar',
             isNullable: true,
           },
           {
-            name: 'twitter',
+            name: 'column3',
             type: 'varchar',
             isNullable: true,
           },
           {
-            name: 'twitch',
+            name: 'column4',
             type: 'varchar',
             isNullable: true,
           },
@@ -57,6 +55,6 @@ export class CreateSocials1617646181807 implements MigrationInterface {
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.dropTable('socials');
+    await queryRunner.dropTable('tournamentColumns');
   }
 }
