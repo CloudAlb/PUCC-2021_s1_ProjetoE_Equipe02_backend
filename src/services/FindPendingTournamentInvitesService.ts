@@ -23,7 +23,7 @@ class FindPendingTournamentInvitesService {
 
     // TODO, não está filtrando certo
     const tournamentParticipants = await tournamentParticipantsRepository.find({
-      where: { user } && { invite_refused: true } && { user_accepted_invite: false },
+      where: { user, invite_refused: false, user_accepted_invite: false },
     });
 
     return tournamentParticipants;

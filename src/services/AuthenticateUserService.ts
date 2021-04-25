@@ -20,7 +20,9 @@ class AuthenticateUserService {
   public async execute({ login, password }: Request): Promise<Response> {
     const usersRepository = getRepository(User);
 
-    const user = await usersRepository.findOne({ where: { username: login } || { email: login } });
+    const user = await usersRepository.findOne({
+      where: [{ username: login }, { email: login }],
+    });
 
     // TODO, ajeitar todos os HTTP status code
     // Por que tem que deixar 200 para funcionar?

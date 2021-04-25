@@ -25,7 +25,7 @@ class FindTournamentsUserIsParticipatingService {
 
     const acceptedTournamentsInvitesOfUser = await tournamentParticipantRepository.find(
       {
-        where: { user } || { user_accepted_invite: true },
+        where: { user, user_accepted_invite: true },
       },
     );
 
