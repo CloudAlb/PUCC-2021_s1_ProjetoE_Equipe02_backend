@@ -1,145 +1,64 @@
 // TODO: Arrumar a rota
 import { Router } from 'express';
-
+import { getRepository } from 'typeorm';
 import { v4 } from 'uuid';
+import ensureAuthenticated from '../middlewares/ensureAuthenticated';
 
-const pubsRouter = Router();
+import Tournament from '../models/Tournament';
+import CreateTournamentService from '../services/CreateTournamentService';
+import FindTournamentsByUserService from '../services/FindTournamentsByUserService';
 
-interface Pub {
-    // info
-    id_pub: string;
-    id_user: string;
-    publicacao?: string;
+import FindTournamentService from '../services/FindTournamentService';
+import UpdateTournamentService from '../services/UpdateTournamentService';
 
-    // bd
-    created_at: string;
-    updated_at: string;
+const tournamentsRouter = Router();
 
-    campeonato?: {
-        id: string;
-        nome: string;
-        jogo: string;
-    }
-};
+// não deve ser lançado
+tournamentsRouter.get('/list', async (request, response) => {
+  const tournamentsRepository = getRepository(Tournament);
 
-let pubs: Pub[] = [];
+  const tournaments = await tournamentsRepository.find();
 
-pubs.push({
-    id_pub: "555",
-    id_user: "1",
-    publicacao: "Olá pessoal sou um novo usuário !!!",
-
-    created_at: "2021-04-06-21-00-00",
-    updated_at: "2021-04-06-21-00-00",
-
-    campeonato: {
-            id: "",
-            nome: "",
-            jogo: ""
-    }
-},{
-  id_pub: "1518",
-  id_user: "5",
-  publicacao: "",
-
-  created_at: "2021-04-06-21-00-00",
-  updated_at: "2021-04-06-21-00-00",
-
-  campeonato: {
-          id: "118",
-          nome: "WOGL",
-          jogo: "Crossfire"
-  }
-})
-
-pubsRouter.get('/', async (request, response) => {
-    return response.json({ data: pubs })
+  return response.json({ data: tournaments });
 });
 
-pubsRouter.get('/:id', async (request, response) => {
-    let { id } = request.params;
+tournamentsRouter.get('/id/:id', ensureAuthenticated, async (request, response) => {
+  let { id } = request.params;
 
-    let findPubs = pubs.find((pub) => {
-        return pub.id_pub == id;
-    });
+  const findTournamentService = new FindTournamentService();
+  const tournament = await findTournamentService.execute(id);
 
-    if (!findPubs) {
-        return response.json({ message: "Publicação não encontrada !!!" });
-    }
-
-    return response.json({ data: findPubs })
+  return response.json({ data: tournament });
 });
 
-pubsRouter.post('/', async (request, response) => {
-    const { publicacao, campeonato } = request.body;
+tournamentsRouter.get('/user', ensureAuthenticated, async (request, response) => {
+  const findTournamentByUserService = new FindTournamentsByUserService();
+  const tournaments = await findTournamentByUserService.execute(request.user.id_user);
 
-    const today = new Date();
-    const dd = String(today.getDate()).padStart(2, '0');
-    const mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
-    const yyyy = today.getFullYear();
-
-    const todayFormattedDate = dd + '/' + mm + '/' + yyyy;
-
-    const pub = { id_pub: v4(),
-                  id_user: v4(),
-                  publicacao,
-                  created_at: todayFormattedDate,
-                  updated_at: todayFormattedDate,
-                  campeonato };
-
-    pubs.push(pub);
-
-    return response.json({ message: "Publicação criada com sucesso !!!" })
+  // TODO, por que não retorna o campo usuário?
+  console.log(tournaments)
+  return response.json({ data: tournaments });
 });
 
-pubsRouter.patch('/edit/:id', async (request, response) => {
-    const { id } = request.params;
-    const { publicacao } = request.body;
+tournamentsRouter.post('/', ensureAuthenticated, async (request, response) => {
+  const { name, game, description, password, number_participants } = request.body;
 
-    const findPubIndex = pubs.findIndex((pub) => {
-        if (pub.id_pub == id) return true;
-    });
+  const createTournamentService = new CreateTournamentService();
 
-    if (findPubIndex == -1) {
-        return response.json({ message: "Publicação não encontrada !!!" });
-    }
+  createTournamentService.execute({ id_user: request.user.id_user, name, game, description, password, number_participants });
 
-    const today = new Date();
-    const dd = String(today.getDate()).padStart(2, '0');
-    const mm = String(today.getMonth() + 1).padStart(2, '0');
-    const yyyy = today.getFullYear();
-
-    const todayFormattedDate = dd + '/' + mm + '/' + yyyy;
-
-    pubs[findPubIndex].publicacao = publicacao;
-    pubs[findPubIndex].updated_at = todayFormattedDate;
-
-    return response.json({ message: "Publicação atualizada com sucesso !!!" })
+  return response.json({ message: 'Tournament created sucessfully.' });
 });
 
-pubsRouter.patch('/edit/campeonato/:id', async (request, response) => {
+tournamentsRouter.patch('/edit/:id', async (request, response) => {
   const { id } = request.params;
-  const { campeonato } = request.body;
+  const { name, game, description, password } = request.body;
 
-  const findPubIndex = pubs.findIndex((pub) => {
-      if (pub.id_pub == id) return true;
-  });
+  const updateTournamentService = new UpdateTournamentService();
 
-  if (findPubIndex == -1) {
-      return response.json({ message: "Publicação não encontrada !!!" });
-  }
+  updateTournamentService.execute({ id, name, game, description, password });
 
-  const today = new Date();
-  const dd = String(today.getDate()).padStart(2, '0');
-  const mm = String(today.getMonth() + 1).padStart(2, '0');
-  const yyyy = today.getFullYear();
-
-  const todayFormattedDate = dd + '/' + mm + '/' + yyyy;
-
-  pubs[findPubIndex].campeonato = campeonato;
-  pubs[findPubIndex].updated_at = todayFormattedDate;
-
-  return response.json({ message: "Publicação atualizada com sucesso !!!" })
+  return response.json({ message: 'Tournament updated sucessfully.' });
 });
 
-export default pubsRouter;
+export default tournamentsRouter;

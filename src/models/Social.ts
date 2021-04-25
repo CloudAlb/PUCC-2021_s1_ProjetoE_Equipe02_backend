@@ -4,7 +4,6 @@ import {
   PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
-  ManyToOne,
   JoinColumn,
   PrimaryColumn,
   OneToOne,
@@ -14,7 +13,7 @@ import User from './User';
 
 @Entity('socials')
 class Social {
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryGeneratedColumn('increment')
   id_social: string;
 
   @OneToOne(() => User)

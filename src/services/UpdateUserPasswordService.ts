@@ -6,8 +6,6 @@ import AppError from '../errors/AppError';
 import User from '../models/User';
 import Social from '../models/Social';
 
-import GetDateNow from "../services/GetDateNow";
-
 interface Request {
   id_user: string;
   password_old: string;
@@ -33,12 +31,9 @@ class UpdateUserService {
 
     if (!passwordMatched) throw new AppError("Senha atual incorreta.", 200);
 
-    const getDateNow = new GetDateNow();
-
     const hashedNewPassword = await hash(password_new, 8);
 
     user.password = hashedNewPassword;
-    user.updated_at = getDateNow.execute();
 
     await usersRepository.save(user);
 

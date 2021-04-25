@@ -20,12 +20,19 @@ class CreateUserService {
     const usersRepository = getRepository(User);
     const socialsRepository = getRepository(Social);
 
+    const checkUserUsernameExists = await usersRepository.findOne({
+      where: { username },
+    });
 
-    const checkUserExists = await usersRepository.findOne({
+    if (checkUserUsernameExists) {
+      throw new AppError('Username already used.', 200);
+    }
+
+    const checkUserEmailExists = await usersRepository.findOne({
       where: { email },
     });
 
-    if (checkUserExists) {
+    if (checkUserEmailExists) {
       throw new AppError('Email address already used.', 200);
     }
 
@@ -34,7 +41,7 @@ class CreateUserService {
     // TODO, arrumar regras de negócio para avatar_image e background_image
     // TODO, arrumar o formato das datas e padronizar com a equipe
     const user = usersRepository.create({
-      id_user: v4(), name, username, email, birth_date, password: hashedPassword, avatar_image: "", background_image: "", bio: "", level: "1", coins: "0", friends: "0"
+      id_user: v4(), name, username, email, birth_date, password: hashedPassword, avatar_image: "", background_image: "", bio: "", level: "1", coins: "0", followers: "0"
     });
     await usersRepository.save(user);
 

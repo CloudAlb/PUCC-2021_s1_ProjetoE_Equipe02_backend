@@ -4,51 +4,43 @@ import {
   PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  JoinColumn,
+  OneToOne,
 } from 'typeorm';
+import User from './User';
 
 @Entity('tournaments')
-class User {
+class Tournament {
   @PrimaryGeneratedColumn('uuid')
-  id_camp: string;
+  id_tournament: string;
 
   @Column()
   name: string;
 
   @Column()
-  username: string;
+  game: string;
 
   @Column()
-  email: string;
-
-  @Column()
-  birth_date: Date;
+  description: string;
 
   @Column()
   password: string;
 
-  @Column()
-  avatar_image: string;
-
-  @Column()
-  background_image: string;
-
-  @Column()
-  bio: string;
-
-  @Column()
-  level: string;
-
-  @Column()
-  coins: string;
-
-  @Column()
-  friends: string;
+  @CreateDateColumn()
+  ended_at: Date;
 
   @CreateDateColumn()
   created_at: Date;
 
   @UpdateDateColumn()
   updated_at: Date;
+
+  @OneToOne(() => User, { eager: true })
+  @JoinColumn({ name: 'user_id' })
+  user: User;
+
+  @Column()
+  number_participants: number;
 }
 
-export default User;
+export default Tournament;
