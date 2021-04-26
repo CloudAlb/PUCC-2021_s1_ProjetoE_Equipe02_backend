@@ -22,30 +22,51 @@ tournamentsRouter.get('/list', async (request, response) => {
   return response.json({ data: tournaments });
 });
 
-tournamentsRouter.get('/id/:id', ensureAuthenticated, async (request, response) => {
-  let { id } = request.params;
+tournamentsRouter.get(
+  '/id/:id',
+  ensureAuthenticated,
+  async (request, response) => {
+    let { id } = request.params;
 
-  const findTournamentService = new FindTournamentService();
-  const tournament = await findTournamentService.execute(id);
+    const findTournamentService = new FindTournamentService();
+    const tournament = await findTournamentService.execute(id);
 
-  return response.json({ data: tournament });
-});
+    return response.json({ data: tournament });
+  },
+);
 
-tournamentsRouter.get('/user', ensureAuthenticated, async (request, response) => {
-  const findTournamentByUserService = new FindTournamentsByUserService();
-  const tournaments = await findTournamentByUserService.execute(request.user.id_user);
+tournamentsRouter.get(
+  '/user',
+  ensureAuthenticated,
+  async (request, response) => {
+    const findTournamentByUserService = new FindTournamentsByUserService();
+    const tournaments = await findTournamentByUserService.execute(
+      request.user.id_user,
+    );
 
-  // TODO, por que não retorna o campo usuário?
-  console.log(tournaments)
-  return response.json({ data: tournaments });
-});
+    return response.json({ data: tournaments });
+  },
+);
 
 tournamentsRouter.post('/', ensureAuthenticated, async (request, response) => {
-  const { name, game, description, password, number_participants } = request.body;
+  const {
+    name,
+    game,
+    description,
+    password,
+    number_participants,
+  } = request.body;
 
   const createTournamentService = new CreateTournamentService();
 
-  createTournamentService.execute({ id_user: request.user.id_user, name, game, description, password, number_participants });
+  createTournamentService.execute({
+    id_user: request.user.id_user,
+    name,
+    game,
+    description,
+    password,
+    number_participants,
+  });
 
   return response.json({ message: 'Tournament created sucessfully.' });
 });

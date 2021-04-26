@@ -7,6 +7,8 @@ import CreateTournamentParticipantService from '../services/CreateTournamentPart
 import FindAcceptedTournamentParticipantsService from '../services/FindAcceptedTournamentParticipantsService';
 import FindPendingTournamentInvitesService from '../services/FindPendingTournamentInvitesService';
 import FindTournamentsUserIsParticipatingService from '../services/FindTournamentsUserIsParticipatingService';
+import UpdateTournamentsInviteUserAcceptedService from '../services/UpdateTournamentsInviteUserAcceptedService';
+import UpdateTournamentsInviteUserRefusedService from '../services/UpdateTournamentsInviteUserRefusedService';
 
 const tournamentParticipantsRouter = Router();
 
@@ -97,13 +99,49 @@ tournamentParticipantsRouter.post(
 
     const createTournamentParticipantService = new CreateTournamentParticipantService();
 
-    createTournamentParticipantService.execute({
+    await createTournamentParticipantService.execute({
       id_user: id,
       id_tournament,
       creator_id_user: request.user.id_user,
     });
 
     return response.json({ message: 'Invitation created sucessfully.' });
+  },
+);
+
+// aceita um convite de um torneio
+tournamentParticipantsRouter.patch(
+  '/accept/:id',
+  ensureAuthenticated,
+  async (request, response) => {
+    const { id } = request.params;
+
+    const updateTournamentsInviteUserAcceptedService = new UpdateTournamentsInviteUserAcceptedService();
+
+    await updateTournamentsInviteUserAcceptedService.execute({
+      id_tournament: id,
+      id_user: request.user.id_user,
+    });
+
+    return response.json({ message: 'Invitation accepted.' });
+  },
+);
+
+// recusa um convite de um torneio
+tournamentParticipantsRouter.patch(
+  '/refuse/:id',
+  ensureAuthenticated,
+  async (request, response) => {
+    const { id } = request.params;
+
+    const updateTournamentsInviteUserRefusedService = new UpdateTournamentsInviteUserRefusedService();
+
+    await updateTournamentsInviteUserRefusedService.execute({
+      id_tournament: id,
+      id_user: request.user.id_user,
+    });
+
+    return response.json({ message: 'Invitation accepted.' });
   },
 );
 
