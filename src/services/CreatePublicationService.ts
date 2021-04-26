@@ -36,7 +36,7 @@ class CreatePublicationService {
     }
 
     const publication = pubsRepository.create({
-      user, tournament
+      tournament
     });
 
     await pubsRepository.save(publication);

@@ -4,6 +4,7 @@ import ensureAuthenticated from '../middlewares/ensureAuthenticated';
 
 import Publication from '../models/Publication';
 import CreatePublicationService from '../services/CreatePublicationService';
+import FindTournamentsPublicatedService from '../services/FindTournamentsPublicatedService';
 
 const pubsRouter = Router();
 
@@ -15,15 +16,6 @@ pubsRouter.get('/', async (request, response) => {
   return response.json({ data: publications });
 });
 
-pubsRouter.get('/:id', async (request, response) => {
-    let { id } = request.params;
-
-  const findPublicationService = new FindTournamentService();
-  const publication = await findPublicationService.execute(id);
-
-  return response.json({ data: publication });
-});
-
 pubsRouter.post('/', ensureAuthenticated, async (request, response) => {
   const { id_tournament } = request.body;
 
@@ -33,5 +25,14 @@ pubsRouter.post('/', ensureAuthenticated, async (request, response) => {
 
   return response.json({ message: "Publicação criada com sucesso !!!" })
 });
+
+// pubsRouter.get('/:id', async (request, response) => {
+//   let { id } = request.params;
+
+// const findPublicationService = new FindTournamentsPublicatedService();
+// const publication = await findPublicationService.execute(id);
+
+// return response.json({ data: publication });
+// });
 
 export default pubsRouter;
