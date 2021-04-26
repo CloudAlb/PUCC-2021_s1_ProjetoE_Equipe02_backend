@@ -15,7 +15,7 @@ sessionsRouter.post('/', async (request, response) => {
     password,
   });
 
-  return response.json({ token: token });
+  return response.json({ message: 'User logged in sucessfully', token: token });
 });
 
 export default sessionsRouter;
