@@ -1,140 +1,37 @@
 import { Router } from 'express';
+import { getRepository } from 'typeorm';
+import ensureAuthenticated from '../middlewares/ensureAuthenticated';
 
-import { v4 } from 'uuid';
+import Publication from '../models/Publication';
+import CreatePublicationService from '../services/CreatePublicationService';
 
 const pubsRouter = Router();
 
-interface Pub {
-    // info
-    id_pub: string;
-    id_user: string;
-
-    // bd
-    created_at: string;
-    updated_at: string;
-
-    campeonato: {
-        id: string;
-        nome: string;
-        jogo: string;
-    }
-};
-
-let pubs: Pub[] = [];
-
-pubs.push({
-    id_pub: "555",
-    id_user: "1",
-
-    created_at: "2021-04-06-21-00-00",
-    updated_at: "2021-04-06-21-00-00",
-
-    campeonato: {
-            id: "555",
-            nome: "Bootcamp",
-            jogo: "CS GO"
-    }
-},{
-  id_pub: "1518",
-  id_user: "5",
-
-  created_at: "2021-04-06-21-00-00",
-  updated_at: "2021-04-06-21-00-00",
-
-  campeonato: {
-          id: "118",
-          nome: "WOGL",
-          jogo: "Crossfire"
-  }
-})
-
 pubsRouter.get('/', async (request, response) => {
-    return response.json({ data: pubs })
+  const publicationsRepository = getRepository(Publication);
+
+  const publications = await publicationsRepository.find();
+
+  return response.json({ data: publications });
 });
 
 pubsRouter.get('/:id', async (request, response) => {
     let { id } = request.params;
 
-    let findPubs = pubs.find((pub) => {
-        return pub.id_pub == id;
-    });
+  const findPublicationService = new FindTournamentService();
+  const publication = await findPublicationService.execute(id);
 
-    if (!findPubs) {
-        return response.json({ message: "Publicação não encontrada !!!" });
-    }
-
-    return response.json({ data: findPubs })
+  return response.json({ data: publication });
 });
 
-pubsRouter.post('/', async (request, response) => {
-    const { campeonato } = request.body;
+pubsRouter.post('/', ensureAuthenticated, async (request, response) => {
+  const { id_tournament } = request.body;
 
-    const today = new Date();
-    const dd = String(today.getDate()).padStart(2, '0');
-    const mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
-    const yyyy = today.getFullYear();
+  const createPublicationService = new CreatePublicationService();
 
-    const todayFormattedDate = dd + '/' + mm + '/' + yyyy;
+  createPublicationService.execute({ id_user: request.user.id_user, id_tournament });
 
-    const pub = { id_pub: v4(),
-                  id_user: v4(),
-                  created_at: todayFormattedDate,
-                  updated_at: todayFormattedDate,
-                  campeonato };
-
-    pubs.push(pub);
-
-    return response.json({ message: "Publicação criada com sucesso !!!" })
+  return response.json({ message: "Publicação criada com sucesso !!!" })
 });
-
-pubsRouter.patch('/edit/campeonato/:id', async (request, response) => {
-  const { id } = request.params;
-  const { campeonato } = request.body;
-
-  const findPubIndex = pubs.findIndex((pub) => {
-      if (pub.id_pub == id) return true;
-  });
-
-  if (findPubIndex == -1) {
-      return response.json({ message: "Publicação não encontrada !!!" });
-  }
-
-  const today = new Date();
-  const dd = String(today.getDate()).padStart(2, '0');
-  const mm = String(today.getMonth() + 1).padStart(2, '0');
-  const yyyy = today.getFullYear();
-
-  const todayFormattedDate = dd + '/' + mm + '/' + yyyy;
-
-  pubs[findPubIndex].campeonato = campeonato;
-  pubs[findPubIndex].updated_at = todayFormattedDate;
-
-  return response.json({ message: "Publicação atualizada com sucesso !!!" })
-});
-
-// pubsRouter.patch('/edit/:id', async (request, response) => {
-//     const { id } = request.params;
-//     const { publicacao } = request.body;
-
-//     const findPubIndex = pubs.findIndex((pub) => {
-//         if (pub.id_pub == id) return true;
-//     });
-
-//     if (findPubIndex == -1) {
-//         return response.json({ message: "Publicação não encontrada !!!" });
-//     }
-
-//     const today = new Date();
-//     const dd = String(today.getDate()).padStart(2, '0');
-//     const mm = String(today.getMonth() + 1).padStart(2, '0');
-//     const yyyy = today.getFullYear();
-
-//     const todayFormattedDate = dd + '/' + mm + '/' + yyyy;
-
-//     pubs[findPubIndex].publicacao = publicacao;
-//     pubs[findPubIndex].updated_at = todayFormattedDate;
-
-//     return response.json({ message: "Publicação atualizada com sucesso !!!" })
-// });
 
 export default pubsRouter;
