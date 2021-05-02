@@ -6,6 +6,7 @@ import TournamentParticipants from '../models/TournamentParticipant';
 import CheckUserIsKickedFromTournamentService from '../services/CheckUserIsKickedFromTournamentService';
 import CreateTournamentParticipantService from '../services/CreateTournamentParticipantService';
 import FindAcceptedTournamentParticipantsService from '../services/FindAcceptedTournamentParticipantsService';
+import FindKickedParticipantsFromTournamentService from '../services/FindKickedParticipantsFromTournamentService';
 import FindPendingTournamentInvitesService from '../services/FindPendingTournamentInvitesService';
 import FindTournamentsUserIsParticipatingService from '../services/FindTournamentsUserIsParticipatingService';
 import KickTournamentParticipantService from '../services/KickTournamentParticipantService';
@@ -179,6 +180,23 @@ tournamentParticipantsRouter.post(
     });
 
     return response.json({ message: isUserKicked });
+  },
+);
+
+// retorna um array de users que foram kickados de um torneio
+tournamentParticipantsRouter.get(
+  '/kicked/:id',
+  ensureAuthenticated,
+  async (request, response) => {
+    const { id } = request.params;
+
+    const findKickedParticipantsFromTournamentService = new FindKickedParticipantsFromTournamentService();
+
+    const tournamentKickedUsers = await findKickedParticipantsFromTournamentService.execute(
+      id,
+    );
+
+    return response.json({ data: tournamentKickedUsers });
   },
 );
 
