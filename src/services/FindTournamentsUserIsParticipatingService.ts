@@ -5,10 +5,9 @@ import AppError from '../errors/AppError';
 import User from '../models/User';
 import TournamentParticipant from '../models/TournamentParticipant';
 import Tournament from '../models/Tournament';
-import TournamentParticipants from '../models/TournamentParticipant';
 
 class FindTournamentsUserIsParticipatingService {
-  public async execute(id_user: string): Promise<TournamentParticipants[]> {
+  public async execute(id_user: string): Promise<TournamentParticipant[]> {
     const tournamentParticipantRepository = getRepository(
       TournamentParticipant,
     );

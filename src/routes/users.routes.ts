@@ -11,6 +11,8 @@ import UpdateUserPasswordService from '../services/UpdateUserPasswordService';
 import ensureAuthenticated from '../middlewares/ensureAuthenticated';
 import ensureAdmin from '../middlewares/ensureAdmin';
 import AuthenticateUserService from '../services/AuthenticateUserService';
+import UpdateUserCoinsService from '../services/UpdateUserCoinsService';
+import FindUserColocationsService from '../services/FindUserColocationsService';
 
 const usersRouter = Router();
 
@@ -42,10 +44,12 @@ usersRouter.get('/list', async (request, response) => {
 
 // TODO, criar middleware ensureIsOwnUser é necessário?
 // usar browserAgent, Encrypted Local Storage ou algo do tipo
-usersRouter.get('/', ensureAuthenticated, async (request, response) => {
+usersRouter.get('/:id', ensureAuthenticated, async (request, response) => {
+  const { id } = request.params;
+
   const findUser = new FindUserService();
 
-  const user = await findUser.execute(request.user.id_user);
+  const user = await findUser.execute(id);
 
   const userWithoutPassword = {
     id_user: user.id_user,
@@ -106,13 +110,19 @@ usersRouter.patch('/edit', ensureAuthenticated, async (request, response) => {
   return response.json({ message: 'User info sucessfully updated.' });
 });
 
-usersRouter.get('/social', ensureAuthenticated, async (request, response) => {
-  const findUserSocial = new FindUserSocialService();
+usersRouter.get(
+  '/social/:id',
+  ensureAuthenticated,
+  async (request, response) => {
+    const { id } = request.params;
 
-  const social = await findUserSocial.execute(request.user.id_user);
+    const findUserSocial = new FindUserSocialService();
 
-  return response.json({ data: social });
-});
+    const social = await findUserSocial.execute(id);
+
+    return response.json({ data: social });
+  },
+);
 
 usersRouter.patch(
   '/edit/social',
@@ -147,6 +157,58 @@ usersRouter.patch(
     });
 
     return response.json({ message: 'Password sucessfully updated.' });
+  },
+);
+
+usersRouter.patch(
+  '/coins/add',
+  ensureAuthenticated,
+  async (request, response) => {
+    const { id_user, quantity } = request.body;
+
+    const updateUserCoins = new UpdateUserCoinsService();
+
+    await updateUserCoins.execute({
+      id_user,
+      quantity,
+      operation: 'add',
+    });
+
+    return response.json({ message: quantity + ' coins were given.' });
+  },
+);
+
+usersRouter.patch(
+  '/coins/remove',
+  ensureAuthenticated,
+  async (request, response) => {
+    const { id_user, quantity } = request.body;
+
+    const updateUserCoins = new UpdateUserCoinsService();
+
+    await updateUserCoins.execute({
+      id_user,
+      quantity,
+      operation: 'remove',
+    });
+
+    return response.json({ message: quantity + ' coins were taken.' });
+  },
+);
+
+// vai retornar as colocações de um usuário
+usersRouter.get(
+  '/colocations/:id',
+  // TODO, voltar
+  // ensureAuthenticated,
+  async (request, response) => {
+    const { id } = request.params;
+
+    const findUserColocationsService = new FindUserColocationsService();
+
+    const userColocations = await findUserColocationsService.execute(id);
+
+    return response.json({ data: userColocations });
   },
 );
 

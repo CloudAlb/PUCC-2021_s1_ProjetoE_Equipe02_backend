@@ -27,7 +27,7 @@ class FindAcceptedTournamentParticipantsService {
     });
 
     if (!tournamentParticipants) {
-      throw new AppError('Tournament does not have participants yet.');
+      throw new AppError('Tournament does not have participants yet.', 200);
     }
 
     let tournamentAcceptedParticipantsAsUsers: User[] = [];

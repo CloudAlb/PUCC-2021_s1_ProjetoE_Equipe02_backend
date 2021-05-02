@@ -7,6 +7,7 @@ import CreateTournamentParticipantService from '../services/CreateTournamentPart
 import FindAcceptedTournamentParticipantsService from '../services/FindAcceptedTournamentParticipantsService';
 import FindPendingTournamentInvitesService from '../services/FindPendingTournamentInvitesService';
 import FindTournamentsUserIsParticipatingService from '../services/FindTournamentsUserIsParticipatingService';
+import KickTournamentParticipantService from '../services/KickTournamentParticipantService';
 import UpdateTournamentsInviteUserAcceptedService from '../services/UpdateTournamentsInviteUserAcceptedService';
 import UpdateTournamentsInviteUserRefusedService from '../services/UpdateTournamentsInviteUserRefusedService';
 
@@ -142,6 +143,23 @@ tournamentParticipantsRouter.patch(
     });
 
     return response.json({ message: 'Invitation accepted.' });
+  },
+);
+
+tournamentParticipantsRouter.patch(
+  '/kick',
+  ensureAuthenticated,
+  async (request, response) => {
+    const { id_user, id_tournament } = request.params;
+
+    const kickTournamentParticipantService = new KickTournamentParticipantService();
+
+    await kickTournamentParticipantService.execute({
+      id_tournament,
+      id_user,
+    });
+
+    return response.json({ message: 'User was kicked from tournament.' });
   },
 );
 

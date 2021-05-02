@@ -35,6 +35,9 @@ class TournamentParticipants {
 
   @UpdateDateColumn()
   updated_at: Date;
+
+  @Column()
+  user_kicked: boolean;
 }
 
 export default TournamentParticipants;

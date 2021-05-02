@@ -15,7 +15,7 @@ class TournamentColumns {
   @PrimaryGeneratedColumn('increment')
   id_tournamentColumns: number;
 
-  @OneToOne(() => Tournament)
+  @OneToOne(() => Tournament, { eager: true })
   @JoinColumn({ name: 'tournament_id' })
   tournament: Tournament;
 
@@ -39,6 +39,9 @@ class TournamentColumns {
 
   @Column()
   tournament_initialized: boolean;
+
+  @Column()
+  tournament_ended: boolean;
 }
 
 export default TournamentColumns;

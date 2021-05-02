@@ -14,6 +14,7 @@ interface Request {
 
 interface Response {
   token: string;
+  id_user: string;
 }
 
 class AuthenticateUserService {
@@ -50,7 +51,7 @@ class AuthenticateUserService {
       // estratégias de refresh token
     });
 
-    return { token };
+    return { token, id_user: user.id_user };
   }
 }
 

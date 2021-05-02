@@ -34,7 +34,7 @@ class CreateTournamentParticipantService {
     }
 
     if (creator_id_user == user.id_user) {
-      throw new AppError("You can't invite yourself.");
+      throw new AppError("You can't invite yourself.", 200);
     }
 
     const tournament = await tournamentsRepository.findOne({
@@ -52,7 +52,7 @@ class CreateTournamentParticipantService {
     );
 
     if (userIsAlreadyInvited) {
-      throw new AppError('User is already invited.');
+      throw new AppError('User is already invited.', 200);
     }
 
     const tournamentParticipant = tournamentsParticipantRepository.create({

@@ -9,6 +9,7 @@ import CreateTournamentService from '../services/CreateTournamentService';
 import FindTournamentsByUserService from '../services/FindTournamentsByUserService';
 
 import FindTournamentService from '../services/FindTournamentService';
+import UpdateTournamentAsEndedService from '../services/UpdateTournamentAsEnded';
 import UpdateTournamentService from '../services/UpdateTournamentService';
 
 const tournamentsRouter = Router();
@@ -80,6 +81,16 @@ tournamentsRouter.patch('/edit/:id', async (request, response) => {
   updateTournamentService.execute({ id, name, game, description, password });
 
   return response.json({ message: 'Tournament updated sucessfully.' });
+});
+
+tournamentsRouter.patch('/end/:id', async (request, response) => {
+  const { id } = request.params;
+
+  const updateTournamentAsEndedService = new UpdateTournamentAsEndedService();
+
+  await updateTournamentAsEndedService.execute({ id_tournament: id });
+
+  return response.json({ message: 'Tournament was set as ended.' });
 });
 
 export default tournamentsRouter;
