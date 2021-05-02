@@ -3,6 +3,7 @@ import { getRepository } from 'typeorm';
 import ensureAuthenticated from '../middlewares/ensureAuthenticated';
 
 import TournamentParticipants from '../models/TournamentParticipant';
+import CheckUserIsKickedFromTournamentService from '../services/CheckUserIsKickedFromTournamentService';
 import CreateTournamentParticipantService from '../services/CreateTournamentParticipantService';
 import FindAcceptedTournamentParticipantsService from '../services/FindAcceptedTournamentParticipantsService';
 import FindPendingTournamentInvitesService from '../services/FindPendingTournamentInvitesService';
@@ -150,16 +151,34 @@ tournamentParticipantsRouter.patch(
   '/kick',
   ensureAuthenticated,
   async (request, response) => {
-    const { id_user, id_tournament } = request.params;
+    const { id_user, id_tournament } = request.body;
 
     const kickTournamentParticipantService = new KickTournamentParticipantService();
 
     await kickTournamentParticipantService.execute({
-      id_tournament,
       id_user,
+      id_tournament,
     });
 
     return response.json({ message: 'User was kicked from tournament.' });
+  },
+);
+
+// TODO, não devia ser post
+tournamentParticipantsRouter.post(
+  '/iskicked',
+  ensureAuthenticated,
+  async (request, response) => {
+    const { id_user, id_tournament } = request.body;
+
+    const checkUserIsKickedFromTournamentService = new CheckUserIsKickedFromTournamentService();
+
+    const isUserKicked = await checkUserIsKickedFromTournamentService.execute({
+      id_user,
+      id_tournament,
+    });
+
+    return response.json({ message: isUserKicked });
   },
 );
 
