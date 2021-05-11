@@ -26,13 +26,13 @@ pubsRouter.post('/', ensureAuthenticated, async (request, response) => {
   return response.json({ message: "Publicação criada com sucesso !!!" })
 });
 
-// pubsRouter.get('/:id', async (request, response) => {
-//   let { id } = request.params;
+pubsRouter.get('/find', ensureAuthenticated, async (request, response) => {
 
-// const findPublicationService = new FindTournamentsPublicatedService();
-// const publication = await findPublicationService.execute(id);
+  const findPublicationService = new FindTournamentsPublicatedService();
 
-// return response.json({ data: publication });
-// });
+  const publications = await findPublicationService.execute( request.user.id_user );
+
+  return response.json({ data: publications });
+});
 
 export default pubsRouter;
