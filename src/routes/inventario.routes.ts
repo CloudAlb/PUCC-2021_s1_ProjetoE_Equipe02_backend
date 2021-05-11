@@ -40,7 +40,7 @@ inventarioRouter.post('/', ensureAuthenticated, async (request, response) => {
 
   const addItem = new AddItemService();
 
-  addItem.execute({ id_item, id_user: request.user.id_user});
+  await addItem.execute({ id_item, id_user: request.user.id_user});
 
   return response.json({ message: 'Item adicionado com sucesso !' });
 });
