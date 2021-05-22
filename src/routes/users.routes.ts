@@ -7,6 +7,8 @@ import FindUserService from '../services/FindUserService';
 import FindUserSocialService from '../services/FindUserSocialService';
 import UpdateUserSocialService from '../services/UpdateUserSocialService';
 import UpdateUserService from '../services/UpdateUserService';
+import UpdateUserAvatarService from '../services/UpdateUserAvatarService';
+import UpdateUserBackgroundService from '../services/UpdateUserBackgroundService';
 import UpdateUserPasswordService from '../services/UpdateUserPasswordService';
 import ensureAuthenticated from '../middlewares/ensureAuthenticated';
 import ensureAdmin from '../middlewares/ensureAdmin';
@@ -108,6 +110,32 @@ usersRouter.patch('/edit', ensureAuthenticated, async (request, response) => {
   });
 
   return response.json({ message: 'User info sucessfully updated.' });
+});
+
+usersRouter.patch('/edit/avatar', ensureAuthenticated, async (request, response) => {
+  const { avatar_image } = request.body;
+
+  const updateUserAvatarService = new UpdateUserAvatarService();
+
+  await updateUserAvatarService.execute({
+    id_user: request.user.id_user,
+    avatar_image,
+  });
+
+  return response.json({ message: 'Avatar atualizado com sucesso !' });
+});
+
+usersRouter.patch('/edit/background', ensureAuthenticated, async (request, response) => {
+  const { background_image } = request.body;
+
+  const updateUserBackgroundService = new UpdateUserBackgroundService();
+
+  await updateUserBackgroundService.execute({
+    id_user: request.user.id_user,
+    background_image,
+  });
+
+  return response.json({ message: 'Background atualizado com sucesso !' });
 });
 
 usersRouter.get(
