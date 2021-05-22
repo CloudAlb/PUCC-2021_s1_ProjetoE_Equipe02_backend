@@ -9,11 +9,10 @@ import Item from '../models/Item';
 interface Request {
   id_user: string;
   id_item: number;
-  ativo: boolean;
 }
 
-class UpdateInventarioService {
-  public async execute({ id_user, id_item, ativo }: Request): Promise<Inventario> {
+class UpdateDesativaItemService {
+  public async execute({ id_user, id_item }: Request): Promise<Inventario> {
     const usersRepository = getRepository(User);
     const inventarioRepository = getRepository(Inventario);
     const ItemRepository = getRepository(Item);
@@ -42,7 +41,7 @@ class UpdateInventarioService {
       throw new AppError('Inventario não contém esse item.');
     };
 
-    inventario.ativo = ativo;
+    inventario.ativo = false;
 
     await inventarioRepository.save(inventario);
 
@@ -50,4 +49,4 @@ class UpdateInventarioService {
   }
 }
 
-export default UpdateInventarioService;
+export default UpdateDesativaItemService;

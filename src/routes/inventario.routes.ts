@@ -7,7 +7,8 @@ import AddItemService from '../services/AddItemService';
 import FindInventarioUser from '../services/FindInventarioUserService';
 import FindItensAtivosService from '../services/FindItensAtivosService';
 import ensureAuthenticated from '../middlewares/ensureAuthenticated';
-import UpdateInventarioService from '../services/UpdateInventarioService';
+import UpdateAtivaItemService from '../services/UpdateAtivaItemService';
+import UpdateDesativaItemService from '../services/UpdateDesativaItemService';
 
 const inventarioRouter = Router();
 
@@ -45,18 +46,30 @@ inventarioRouter.post('/', ensureAuthenticated, async (request, response) => {
   return response.json({ message: 'Item adicionado com sucesso !' });
 });
 
-inventarioRouter.patch('/edit/', ensureAuthenticated, async (request, response) => {
-  const { id_item, ativo } = request.body;
+inventarioRouter.patch('/edit/ativa', ensureAuthenticated, async (request, response) => {
+  const { id_item } = request.body;
 
-  const updateInventarioService = new UpdateInventarioService();
+  const updateInventarioService = new UpdateAtivaItemService();
 
   await updateInventarioService.execute({
     id_user: request.user.id_user,
-    id_item,
-    ativo
+    id_item
   });
 
-  return response.json({ message: 'Inventario atualizado com sucesso !' });
+  return response.json({ message: 'Item ativado com sucesso !' });
+});
+
+inventarioRouter.patch('/edit/desativa', ensureAuthenticated, async (request, response) => {
+  const { id_item } = request.body;
+
+  const updateDesativaItemService = new UpdateDesativaItemService();
+
+  await updateDesativaItemService.execute({
+    id_user: request.user.id_user,
+    id_item
+  });
+
+  return response.json({ message: 'Item desativado com sucesso !' });
 });
 
 export default inventarioRouter;
